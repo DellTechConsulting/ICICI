@@ -3,9 +3,6 @@
   hosts: localhost
   connection: local
   gather_facts: no
-  vars: 
-    protection_groups: []
-
 
   tasks:
     - include_vars: vars.yml
@@ -48,19 +45,31 @@
     - debug: 
         var: response
 
-    - set_fact:
-        response_result_count: "{{response.results | length}}"
-
-    - debug: var=response_result_count
+    - name: Filtering the result
+      set_fact: 
+         protection_group_list: "{{ protection_group_list + item.json.clients}}"
+      with_items: "{{response.results}}"
 
     - debug:
-        msg: "{{ item.json.clients[0].protectionGroups }}"
-      with_items: "{{response.results}}"
+        msg: "Clients List: {{ protection_group_list }}"
+
+    - set_fact:
+        protection_group_count: "{{protection_group_list | length}}"
+
+    - debug: var=protection_group_count
+
+    - block:
+      - name: "End play if no protection policy is found for Client"
+        debug:
+          msg: "Failed to list the protection policy for the given client as it does not exist in any of the locations."
+
+      - meta: end_play
+      when: protection_group_count|int == 0
 
     - name: Combining the Protection Groups results from all the locations
       set_fact: 
-        protection_groups: "{{ protection_groups + item.json.clients[0].protectionGroups }}"
-      with_items: "{{response.results}}"
+        protection_groups: "{{ protection_groups + item.protectionGroups }}"
+      with_items: "{{protection_group_list}}"
 
     - debug:
         msg: "List of Protection Groups of the Client: {{ protection_groups }}"
