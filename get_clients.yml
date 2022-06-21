@@ -1,0 +1,69 @@
+---
+- name: Networker Client Details
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars: 
+    protection_groups: []
+
+
+  tasks:
+    - include_vars: vars.yml
+    - include_vars: locations.yml
+
+    - set_fact:
+        client_name: "{{ client }}"
+
+    - debug: 
+        msg: "{{client_name}}"
+
+    - set_fact: 
+        endpoint: "{{ item.server_ip }}"
+        username: "{{ item.username }}"
+        password: "{{ item.password }}"
+      with_items: "{{location}}"
+
+    - debug: 
+        msg: "Endpoint: {{endpoint}}, Username: {{username}}, Password: {{password}}"
+  
+    - debug: 
+        msg: "{{item}}"
+      with_items: "{{location}}"
+
+    - name: Networker Client Details REST call using URI to get information from Networker API
+      uri:
+        url: "https://{{item.server_ip}}:9090/nwrestapi/v3/global/clients?q=hostname:'{{client_name}}'"
+        validate_certs: false
+        user: "{{item.username}}"
+        password: "{{item.password}}"
+        headers:
+          Content-Type: "application/json"
+        method: GET
+        body_format: json
+        status_code:
+          - 200
+      with_items: "{{location}}"
+      register: response
+
+    - debug: 
+        var: response
+
+    - set_fact:
+        response_result_count: "{{response.results | length}}"
+
+    - debug: var=response_result_count
+
+    - debug:
+        msg: "{{ item.json.clients[0].protectionGroups }}"
+      with_items: "{{response.results}}"
+
+    - name: Combining the Protection Groups results from all the locations
+      set_fact: 
+        protection_groups: "{{ protection_groups + item.json.clients[0].protectionGroups }}"
+      with_items: "{{response.results}}"
+
+    - debug:
+        msg: "List of Protection Groups of the Client: {{ protection_groups }}"
+
+    - debug:
+        var: protection_groups
