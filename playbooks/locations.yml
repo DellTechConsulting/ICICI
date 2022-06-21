@@ -1,0 +1,10 @@
+---
+location:
+  - server_name: location1
+    server_ip: 10.241.216.134
+    username: administrator
+    password: Password123!
+  - server_name: location2
+    server_ip: 10.241.216.134
+    username: administrator
+    password: Password123!
