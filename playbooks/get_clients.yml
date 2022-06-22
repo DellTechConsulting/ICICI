@@ -3,9 +3,12 @@
   hosts: localhost
   connection: local
   gather_facts: no
+<<<<<<< HEAD
   vars: 
     protection_groups: []
     protection_group_list: []
+=======
+>>>>>>> 90fc5fbe8fc6d0735ff1c9b52194e6b16b6147c5
 
   tasks:
     - include_vars: vars.yml
@@ -39,16 +42,26 @@
     - debug: 
         var: response
 
-    - set_fact:
-        response_result_count: "{{response.results | length}}"
-
-    - debug: var=response_result_count
-
-    - set_fact: 
-          protection_group_list: "{{ protection_group_list + item.json.clients}}"
+    - name: Filtering the result
+      set_fact: 
+         protection_group_list: "{{ protection_group_list + item.json.clients}}"
       with_items: "{{response.results}}"
+
+    - debug:
+        msg: "Clients List: {{ protection_group_list }}"
+
+    - set_fact:
+        protection_group_count: "{{protection_group_list | length}}"
+
+    - debug: var=protection_group_count
     
-    - debug: var=protection
+    - block:
+      - name: "End play if no protection policy is found for Client"
+        debug:
+          msg: "Failed to list the protection policy for the given client as it does not exist in any of the locations."
+
+      - meta: end_play
+      when: protection_group_count|int == 0
 
     - name: Combining the Protection Groups results from all the locations
       set_fact: 
