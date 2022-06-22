@@ -5,7 +5,7 @@
   gather_facts: no
   vars: 
     protection_groups: []
-
+    protection_group_list: []
 
   tasks:
     - include_vars: vars.yml
@@ -17,15 +17,6 @@
     - debug: 
         msg: "{{client_name}}"
 
-    - set_fact: 
-        endpoint: "{{ item.server_ip }}"
-        username: "{{ item.username }}"
-        password: "{{ item.password }}"
-      with_items: "{{location}}"
-
-    - debug: 
-        msg: "Endpoint: {{endpoint}}, Username: {{username}}, Password: {{password}}"
-  
     - debug: 
         msg: "{{item}}"
       with_items: "{{location}}"
@@ -53,14 +44,16 @@
 
     - debug: var=response_result_count
 
-    - debug:
-        msg: "{{ item.json.clients[0].protectionGroups }}"
+    - set_fact: 
+          protection_group_list: "{{ protection_group_list + item.json.clients}}"
       with_items: "{{response.results}}"
+    
+    - debug: var=protection
 
     - name: Combining the Protection Groups results from all the locations
       set_fact: 
-        protection_groups: "{{ protection_groups + item.json.clients[0].protectionGroups }}"
-      with_items: "{{response.results}}"
+        protection_groups: "{{ protection_groups + item.protectionGroups }}"
+      with_items: "{{protection_group_list}}"
 
     - debug:
         msg: "List of Protection Groups of the Client: {{ protection_groups }}"
