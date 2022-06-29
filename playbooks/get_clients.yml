@@ -5,8 +5,8 @@
   gather_facts: no
 
   tasks:
-    - include_vars: vars.yml
-    - include_vars: locations.yml
+    - include_vars: vars/var.yml
+    - include_vars: vars/locations.yml
 
     - set_fact:
         client_name: "{{ client }}"
@@ -14,15 +14,6 @@
     - debug: 
         msg: "{{client_name}}"
 
-    - set_fact: 
-        endpoint: "{{ item.server_ip }}"
-        username: "{{ item.username }}"
-        password: "{{ item.password }}"
-      with_items: "{{location}}"
-
-    - debug: 
-        msg: "Endpoint: {{endpoint}}, Username: {{username}}, Password: {{password}}"
-  
     - debug: 
         msg: "{{item}}"
       with_items: "{{location}}"
@@ -51,16 +42,16 @@
       with_items: "{{response.results}}"
 
     - debug:
-        msg: "Clients List: {{ protection_group_list }}"
+        msg: "Group List: {{ protection_group_list }}"
 
     - set_fact:
         protection_group_count: "{{protection_group_list | length}}"
 
     - debug: var=protection_group_count
-
+    
     - block:
       - name: "End play if no protection policy is found for Client"
-        debug:
+        fail:
           msg: "Failed to list the protection policy for the given client as it does not exist in any of the locations."
 
       - meta: end_play

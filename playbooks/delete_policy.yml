@@ -1,0 +1,52 @@
+---
+- name: Networker Client Details
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - include_vars: vars/vars.yml
+    - include_vars: vars/locations.yml
+
+    - set_fact:
+        policy_name: "{{ policy_name }}"
+
+    - debug: 
+        msg: "{{policy_name}}"
+
+    - debug: 
+        msg: "{{item}}"
+      with_items: "{{location}}"
+
+    - name: Calling the REST API call block
+      block:
+      - name: Networker Client Details REST call using URI to get information from Networker API
+        uri:
+          url: "https://{{item.server_ip}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}"
+          validate_certs: false
+          user: "{{item.username}}"
+          password: "{{item.password}}"
+          headers:
+            Content-Type: "application/json"
+          method: GET
+          body_format: json
+          status_code:
+            - 200
+            - 404
+            - 401
+        with_items: "{{location}}"
+        register: response
+
+      - debug: 
+          var: response.results
+
+      rescue:
+        - name: Error when calling the REST API
+          debug:
+            msg: "Error when calling the REST API - {{ response.results }} "
+
+    - name: Verifying Policy exists in the locations
+      debug:
+        msg: "{{ response.results|map(attribute='json.name') }}"
+      
+
