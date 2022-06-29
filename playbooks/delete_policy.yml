@@ -50,3 +50,19 @@
         msg: "{{ response.results|map(attribute='json.name') }}"
       
 
+#    - name: Networker Client Details REST call using URI to get information from Networker API
+#      uri:
+#        url: "https://{{location.server_ip}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}"
+#        validate_certs: false
+#        user: "{{item.username}}"
+#        password: "{{item.password}}"
+#        headers:
+#          Content-Type: "application/json"
+#        method: DELETE
+#        body_format: json
+#        status_code:
+#          - 204
+#      register: result
+
+#    - debug: 
+#        var: result
