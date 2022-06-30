@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - include_vars: ../vars/var.yml
+    - name: Testing
+
+      debug: var=response
+
+    - name: Just the Names
+      debug: msg="{{ response | json_query('restartTimeWindow')}}"
+      # vars:
+      #   jmesquery: "[*].startTime"
+
+
+    # - debug: var=array_job_options
+

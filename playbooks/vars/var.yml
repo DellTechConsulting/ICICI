@@ -1,4 +1,8 @@
 ---
+location_name: location1
+protection_group: "Bronze-Application1"
+new_policy_name: "Test-policy"
+new_workflow_name: "new_workflow"
 client: "c220216134"
 protection_groups: []
 protection_group_list: []
