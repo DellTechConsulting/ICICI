@@ -1,0 +1,106 @@
+---
+- name: Networker Client Details
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - include_vars: vars/vars.yml
+    - include_vars: vars/locations.yml
+
+    - set_fact:
+        policy_name: "{{ policy_name }}"
+
+    - debug: 
+        msg: "{{policy_name}}"
+
+    - debug: 
+        msg: "{{item}}"
+      with_items: "{{location}}"
+
+    - set_fact:
+        endpoint: "{{location_ip}}"
+
+    - set_fact:
+        location_username: "{{item.username}}"
+        location_password: "{{item.password}}"
+      with_items: "{{location}}"
+      when: item.server_ip == endpoint
+
+    - name: Executing the GET method NMC REST API Block
+      block:
+      - name: Making GET request to get the Policy details of '{{policy_name}}' using Networker REST API
+        uri:
+          url: "https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}"
+          validate_certs: false
+          user: "{{location_username}}"
+          password: "{{location_password}}"
+          headers:
+            Content-Type: "application/json"
+          method: GET
+          body_format: json
+          status_code:
+            - 200
+            - 404
+            - 401
+        register: response
+
+      - debug: 
+          var: response
+
+      - block:
+        - name: "End play if Policy name '{{policy_name}}' Not Found"
+          fail:
+            msg: "The policy '{{policy_name}}' not Found in the provided location endpoint {{endpoint}}"
+
+        - meta: end_play
+        when: response.status == 404
+
+      - block:
+        - name: "End play if Unauthorized Access"
+          fail:
+            msg: "Unauthorized access: The username or password is incorrect"
+
+        - meta: end_play
+        when: response.status == 401
+
+      rescue:
+        - name: Error when calling the GET REST API
+          debug:
+            msg: "Error when calling the GET REST API - '{{ response.json.message }}'."
+        - meta: end_play
+
+    - name: Verifying Policy exists in the locations
+      debug:
+        msg: "The Policy '{{policy_name}}' exists in the provided location endpoint {{endpoint}}."
+      when: policy_name == response.json.name
+      
+    - name: Executing the DELETE method NMC REST API Block
+      block:
+      - name: Deleting the Policy '{{policy_name}}' from the provided location endpoint {{endpoint}}
+        uri:
+          url: "https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}"
+          validate_certs: false
+          user: "{{location_username}}"
+          password: "{{location_password}}"
+          headers:
+            Content-Type: "application/json"
+          method: DELETE
+          body_format: json
+          status_code:
+            - 204
+        register: result
+
+      - debug: 
+          var: result
+
+      - debug: 
+          msg: "The policy '{{policy_name}}' is deleted successfully from the provided location endpoint {{endpoint}}"
+        when: result.status == 204
+
+      rescue:
+        - name: Error when calling the DELETE REST API
+          debug:
+            msg: "Error when calling the DELETE REST API - {{ result.json.message }} "
+        - meta: end_play
+    

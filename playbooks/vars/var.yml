@@ -6,3 +6,5 @@ new_workflow_name: "new_workflow"
 client: "c220216134"
 protection_groups: []
 protection_group_list: []
+policy_name: "Test2-policy"
+location_ip: "10.241.216.134"
