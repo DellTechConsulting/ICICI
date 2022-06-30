@@ -1,5 +1,5 @@
 ---
-- name: Networker Client Details
+- name: Networker client policy Details
   hosts: localhost
   connection: local
   gather_facts: no

@@ -18,11 +18,18 @@
 - debug: var=response
 
 - debug: 
-    msg: "Specified protection group does not exists in the server."
-  when: response.status == 404
-  
-- include_tasks: create_new_group.yml
-  when: response.status == 404
+    msg: "{{protection_group}} exists in the given location."
+  when: response.status == 200
 
 - include_tasks: create_new_policy.yml
   when: response.status == 200
+
+- name: Checking protection group
+  block:
+  - fail: 
+      msg: "{{response.json.message}}"
+    when: response.status == 404
+
+  rescue:
+  - include_tasks: create_new_group.yml
+    when: response.status == 404

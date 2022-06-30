@@ -1,7 +1,7 @@
 ---
 - name: Get policy details
   uri:
-    url: https://10.241.216.134:9090/nwrestapi/v3/global/protectionpolicies/{{new_policy_name}}
+    url: https://10.241.216.134:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}
     validate_certs: false
     user: "{{username}}"
     password: "{{password}}"
@@ -17,8 +17,8 @@
 - debug: var=response
 
 - fail:
-    msg: "Playbook failed has this policy {{new_policy_name}} already exists."
-  when: response.status != 200
-
-- include_tasks: create_new_policy.yml
+    msg: "Playbook failed, there is policy with name {{policy_name}} already exists."
   when: response.status == 200
+
+- include_tasks: protection_group_validation.yml
+  when: response.status == 404

@@ -10,11 +10,11 @@
       Content-Type: "application/json"
     method: POST
     body:
-      name: "{{new_policy_name}}"
+      name: "{{policy_name}}"
       workflows:
         - autoStartEnabled: false
           description: "Traditional Backup to pool Default, with expiration 1 Months;"
-          name: "{{new_workflow_name}}"
+          name: "{{workflow_name}}"
           protectionGroups:
             - "{{protection_group}}"
     body_format: json
@@ -26,10 +26,8 @@
 - debug: var=response
 
 - fail:
-    msg: "Playbook failed There is already a Protection Policy with name {{new_policy_name}}"
-- fail:
-    msg: "Failed to create new backup policy"
-  when: response.status != 201
+    msg: "{{response.json.message}}"
+  when: response.status == 400
 
 - debug: 
     msg: "Successfully created new backup policy."

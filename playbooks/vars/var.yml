@@ -1,10 +1,8 @@
 ---
-location_name: location1
-protection_group: "Bronze-Application1"
-new_policy_name: "Test-policy"
-new_workflow_name: "new_workflow"
+location_name: location2
+protection_group: "New_policy3"
+policy_name: "Test-policy4"
+workflow_name: "new_workflow"
 client: "c220216134"
 protection_groups: []
 protection_group_list: []
-policy_name: "Test2-policy"
-location_ip: "10.241.216.134"
