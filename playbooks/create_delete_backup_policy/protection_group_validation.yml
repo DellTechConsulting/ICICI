@@ -1,8 +1,9 @@
 ---
 - name: protection group validation
-
-  uri:
-    url: https://{{endpoint}}:9090/nwrestapi/v1/global/protectiongroups/{{protection_group}}
+  set_fact:
+    protection_group: "{{new_backup_policy.workflows[0].protectionGroups[0]}}"
+- uri:
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectiongroups/{{protection_group}}
     validate_certs: false
     user: "{{username}}"
     password: "{{password}}"

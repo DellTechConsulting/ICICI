@@ -2,7 +2,7 @@
 - name: create new protection group
 
   uri:
-    url: https://10.241.216.134:9090/nwrestapi/v1/global/protectiongroups
+    url: https://10.241.216.134:9090/nwrestapi/v3/global/protectiongroups
     validate_certs: false
     user: "{{username}}"
     password: "{{password}}"

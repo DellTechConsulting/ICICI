@@ -1,0 +1,9 @@
+---
+- name: Remove link field from json 
+  json_patch: 
+    src: "data.json"
+    operations:
+      - op: remove
+        path: "/links"
+    pretty: yes
+

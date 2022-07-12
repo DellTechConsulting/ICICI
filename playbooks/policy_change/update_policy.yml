@@ -1,0 +1,121 @@
+---
+- name: Fetching specific policy details
+  uri: 
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies/{{existing_policy_name}}/workflows/{{workflow_name}}
+    method: GET
+    user: "{{username}}"
+    password: "{{password}}"
+    validate_certs: no
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body_format: json            
+    status_code: 202,200,404
+  register: policy_response
+- debug: var=policy_response.json
+
+- fail:
+    msg: "Playbook failed, there is no policy/workfloe exists with the name {{existing_policy_name}}/{{workflow_name}} in the given location"
+  when: policy_response.status == 404
+
+#Creates an job options json file
+- name: check if job options file exists or not
+  stat:
+    path: "data.json"
+  register: file_to_delete
+
+- debug:
+    msg:
+      - "Printing the status of the job options file"
+      - "{{file_to_delete}}"
+
+- name: Delete the job options file if it exists
+  file:
+    path: "data.json"
+    state: absent
+  when: file_to_delete.stat.exists and file_to_delete.stat.isreg
+  register: file_deleted
+
+- name: Create job options file
+  file:
+    path: "data.json"
+    state: touch
+  when: file_deleted is defined or file_to_delete.stat.exists == false
+
+# Copying the recommended job options to the json file created
+- delegate_to: localhost
+  copy:
+    content: "{{policy_response.json}}"
+    dest: "data.json"
+
+- include: remove_link.yml
+
+- name: check if policy details file exists or not
+  stat:
+    path: "policy_data.json"
+  register: file_to_delete
+
+- debug:
+    msg:
+      - "Printing the status of the job options file"
+      - "{{file_to_delete}}"
+
+- name: Delete the policy options file if it exists
+  file:
+    path: "policy_data.json"
+    state: absent
+  when: file_to_delete.stat.exists and file_to_delete.stat.isreg
+  register: file_deleted
+
+- name: Create policy details file
+  file:
+    path: "policy_data.json"
+    state: touch
+  when: file_deleted is defined or file_to_delete.stat.exists == false
+
+# Copying the recommended job options to the json file created
+- delegate_to: localhost
+  copy:
+    content: "{{policy_info}}"
+    dest: "policy_data.json"
+
+- name: Run a script
+  shell: python ./scripts/new.py
+
+- include_vars:
+    file: updated.json
+    name: variable
+
+- debug: var=variable
+
+- include_vars:
+    file: updated.json
+    name: variable
+
+- debug:
+    msg: "{{variable}}"
+
+- name: update policy details
+  uri: 
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies/{{existing_policy_name}}/workflows/{{workflow_name}}
+    method: PUT
+    user: "{{username}}"
+    password: "{{password}}"
+    validate_certs: no
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+    body:
+      "{{variable}}"
+    body_format: json            
+    status_code: 401,204,200
+  register: policy_update_response
+- debug: var=policy_update_response.status
+
+- debug:
+    msg: "Successfully changed the policy details."
+  when: policy_update_response.status == 204
+
+- fail: 
+    msg: "Failed to change policy details."
+  when: policy_update_response.status != 204

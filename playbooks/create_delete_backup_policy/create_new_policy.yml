@@ -1,6 +1,5 @@
 ---
 - name: Create new backup policy and associate worflow
-
   uri:
     url: https://10.241.216.134:9090/nwrestapi/v3/global/protectionpolicies
     validate_certs: false
@@ -10,17 +9,9 @@
       Content-Type: "application/json"
     method: POST
     body:
-      name: "{{policy_name}}"
-      workflows:
-        - autoStartEnabled: false
-          description: "Traditional Backup to pool Default, with expiration 1 Months;"
-          name: "{{workflow_name}}"
-          protectionGroups:
-            - "{{protection_group}}"
+      "{{new_backup_policy}}"
     body_format: json
-    status_code:
-      - 201
-      - 400
+    status_code: 201,400
   register: response
 
 - debug: var=response

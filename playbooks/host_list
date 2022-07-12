@@ -1,5 +1,0 @@
-[host]
-10.241.216.134
-ansible_user=administrator
-ansible_password=password123!
-ansible_connection=winrm

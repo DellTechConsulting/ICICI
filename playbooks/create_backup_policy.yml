@@ -19,6 +19,6 @@
          - "{{endpoint}}"
          - "{{username}}"
          - "{{password}}"
-    - import_tasks: create_delete_backup_policy/new_policy_validation.yml
+    # - import_tasks: create_delete_backup_policy/new_policy_validation.yml
     
-    # - import_tasks: create_delete_backup_policy/create_new_policy.yml
+    - import_tasks: create_delete_backup_policy/protection_group_validation.yml
