@@ -1,0 +1,24 @@
+---
+- name: Get policy details
+  uri:
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}
+    validate_certs: false
+    user: "{{username}}"
+    password: "{{password}}"
+    headers:
+      Content-Type: "application/json"
+    method: GET
+    body_format: json
+    status_code:
+      - 200
+      - 404
+  register: response
+
+- debug: var=response
+
+- fail:
+    msg: "Playbook failed, there is policy with name {{policy_name}} already exists."
+  when: response.status == 200
+
+- include_tasks: protection_group_validation.yml
+  when: response.status == 404

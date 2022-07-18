@@ -1,0 +1,29 @@
+---
+- name: Get clientId
+  uri: 
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/clients?q=hostname:{{client}}
+    method: GET
+    user: "{{username}}"
+    password: "{{password}}"
+    validate_certs: no
+    headers:
+      Accept: "application/json"
+    body_format: json            
+    status_code: 401,202,200
+  register: output
+
+- debug: var=output
+
+- set_fact:
+     policy_group_name: "{{policy_name}}-{{workflow_name}}"
+- debug: var=policy_group_name
+
+- set_fact:
+    clientId: "{{clientId + [item.resourceId.id]}}"
+  when: policy_group_name in {{item.protectionGroups}}
+  with_items: "{{output.json.clients}}"
+
+# - debug: 
+#     msg:
+- debug: var=clientId
+

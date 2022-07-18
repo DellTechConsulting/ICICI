@@ -1,0 +1,25 @@
+---
+- name: Create new backup policy and associate worflow
+  uri:
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies
+    validate_certs: false
+    user: "{{username}}"
+    password: "{{password}}"
+    headers:
+      Content-Type: "application/json"
+    method: POST
+    body:
+      "{{new_backup_policy}}"
+    body_format: json
+    status_code: 201,400
+  register: response
+
+- debug: var=response
+
+- fail:
+    msg: "{{response.json.message}}"
+  when: response.status == 400
+
+- debug: 
+    msg: "Successfully created new backup policy."
+  when: response.status == 201

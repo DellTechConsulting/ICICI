@@ -1,0 +1,36 @@
+---
+- name: protection group validation
+  set_fact:
+    protection_group: "{{new_backup_policy.workflows[0].protectionGroups[0]}}"
+- uri:
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectiongroups/{{protection_group}}
+    validate_certs: false
+    user: "{{username}}"
+    password: "{{password}}"
+    headers:
+      Content-Type: "application/json"
+    method: GET
+    body_format: json
+    status_code:
+      - 200
+      - 404
+  register: response
+
+- debug: var=response
+
+- debug: 
+    msg: "{{protection_group}} exists in the given location."
+  when: response.status == 200
+
+- include_tasks: create_new_policy.yml
+  when: response.status == 200
+
+- name: Checking protection group
+  block:
+  - fail: 
+      msg: "{{response.json.message}}"
+    when: response.status == 404
+
+  rescue:
+  - include_tasks: create_new_group.yml
+    when: response.status == 404

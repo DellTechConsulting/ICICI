@@ -1,0 +1,31 @@
+---
+- name: Delete policy
+  hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - include_vars: vars/var.yml
+    - include_vars: vars/locations.yml
+
+    - set_fact:
+        policy_name: "{{ policy_name }}"
+
+    - debug: 
+        msg: "{{policy_name}}"
+
+    - set_fact: 
+        endpoint: "{{item.server_ip}}"
+        username: "{{item.username}}"
+        password: "{{item.password}}"
+      when: item.server_name == location_name
+      with_items: "{{location}}"
+
+    - debug:
+        msg:
+         - "{{endpoint}}"
+         - "{{username}}"
+         - "{{password}}"
+         
+    - import_tasks: policy_change/update_policy.yml
+    

@@ -1,0 +1,81 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+
+  tasks:
+    - include_vars: ../vars/var.yml
+    - include_vars: ../vars/locations.yml
+    
+    - set_fact: 
+        endpoint: "{{item.server_ip}}"
+        username: "{{item.username}}"
+        password: "{{item.password}}"
+      when: item.server_name == location_name
+      with_items: "{{location}}"
+
+    - include_tasks: fetch_clientId.yml
+
+    - name: Removing client from a specific policy
+      set_fact: 
+        protection_group: "{{policy_info.protectionGroups[0]}}"
+
+    - debug: var="{{protection_group}}"
+
+    - uri: 
+        url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectiongroups/{{protection_group}}
+        method: GET
+        user: "{{username}}"
+        password: "{{password}}"
+        validate_certs: no
+        headers:
+          Accept: "application/json"
+        body_format: json            
+        status_code: 401,202,200,204
+      register: output
+    - debug: var=output
+
+    - set_fact: 
+        workItems: "{{output.json.workItems}}"
+
+  # Validation for removing client from a policy
+    - debug:
+        msg: "Client doest not exists in the policy to remove"
+      when: item not in workItems
+      with_items: "{{clientId}}" 
+      
+  # Remove client from policy
+    - set_fact: 
+        workItems: "{{ workItems | reject('search', item) | list }}"
+      when: item in workItems
+      with_items: "{{clientId}}"
+
+    - debug: var=workItems
+
+    - name: Removing client from a specific policy
+      uri: 
+        url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectiongroups/{{protection_group}}
+        method: PUT
+        user: "{{username}}"
+        password: "{{password}}"
+        validate_certs: no
+        headers:
+          Accept: "application/json"
+        body:
+          workItems: "{{ workItems }}"
+        body_format: json   
+        status_code: 401,202,200,204         
+      register: output
+    - debug: var=output
+
+    - debug:
+        msg: "Successfully removed client from the specified protection group"
+      when: output.status == 204
+
+    - fail:
+        msg: "Failed to remove client from the specified protection group"
+      when: output.status != 204
+
+
+
+

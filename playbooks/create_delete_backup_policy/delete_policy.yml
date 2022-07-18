@@ -1,0 +1,74 @@
+---
+# - name: Executing the GET method NMC REST API Block
+  # block:
+  # - name: Making GET request to get the Policy details of '{{policy_name}}' using Networker REST API
+  #   uri:
+  #     url: "https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}"
+  #     validate_certs: false
+  #     user: "{{username}}"
+  #     password: "{{password}}"
+  #     headers:
+  #       Content-Type: "application/json"
+  #     method: GET
+  #     body_format: json
+  #     status_code: 200,404,401
+  #   register: response
+
+  # - debug: 
+  #     var: response
+
+  # - block:
+  #   - name: "End play if Policy name '{{policy_name}}' Not Found"
+  #     fail:
+  #       msg: "The policy '{{policy_name}}' not Found in the provided location {{endpoint}} to delete"
+
+  #   - meta: end_play
+  #   when: response.status == 404
+
+  # rescue:
+  # - name: Error when calling the GET REST API
+  #   debug:
+  #     msg: "Error when calling the GET REST API - '{{ response.json.message }}'."
+  # - meta: end_play
+  # - include_tasks: 
+
+  # - name: Verifying Policy exists in the locations
+  #   debug:
+  #     msg: "The Policy '{{policy_name}}' exists in the provided location {{endpoint}}."
+  #   when: policy_name == response.json.name
+      
+- name: Executing the DELETE method NMC REST API Block
+  block:
+  - name: Deleting the Policy '{{policy_name}}' from the provided location endpoint {{endpoint}}
+    uri:
+      url: "https://{{item.server_ip}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}"
+      validate_certs: false
+      user: "{{item.username}}"
+      password: "{{item.password}}"
+      headers:
+        Content-Type: "application/json"
+      method: DELETE
+      body_format: json
+      status_code: 204,404,401
+    with_items: "{{location}}"
+    register: result
+
+  - debug: 
+      var: result
+
+  - debug: 
+      msg: "The policy '{{policy_name}}' is deleted successfully from {{item.item.server_name}}"
+    when: item.status == 204
+    with_items: "{{result.results}}"
+
+  - fail: 
+      msg: "The gievn policy '{{policy_name}}' does not exists in the given {{item.item.server_name}} to delete"
+    when: item.status == 404
+    with_items: "{{result.results}}"
+
+  # rescue:
+  #   - name: Error when calling the DELETE REST API
+  #     debug:
+  #       msg: "Error when calling the DELETE REST API - {{ result.json.message }} "
+  #   - meta: end_play
+  

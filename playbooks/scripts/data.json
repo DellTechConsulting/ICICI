@@ -1,0 +1,73 @@
+{
+    "actions": [
+        {
+            "actionSpecificData": {
+                "backup": {
+                    "backupSpecificData": {
+                        "traditional": {
+                            "destinationPool": "Dev2_pool",
+                            "fileInactivityThresholdInDays": 0,
+                            "timestampFormat": "None",
+                            "verifySyntheticFull": true,
+                            "estimate": false,
+                            "revertToFullWhenSyntheticFullFails": true,
+                            "fileInactivityAlertThresholdPercentage": 0
+                        }
+                    },
+                    "overrideRetentionPeriod": false,
+                    "overrideBackupSchedule": false,
+                    "destinationStorageNodes": [
+                        "nsrserverhost"
+                    ],
+                    "retentionPeriod": "1 Months",
+                    "successThreshold": "Success",
+                    "clientOverride": "ClientCanOverride"
+                }
+            },
+            "comment": "",
+            "completionNotification": {
+                "command": "",
+                "executeOn": "Ignore"
+            },
+            "concurrent": false,
+            "drivenBy": "",
+            "enabled": true,
+            "failureImpact": "Continue",
+            "hardLimit": "00:00",
+            "inactivityTimeoutInMin": 30,
+            "name": "Backup",
+            "parallelism": 100,
+            "retries": 1,
+            "retryDelayInSec": 30,
+            "scheduleActivities": [
+                "incr",
+                "incr",
+                "incr",
+                "incr",
+                "incr",
+                "incr",
+                "incr"
+            ],
+            "scheduleOverrides": [],
+            "schedulePeriod": "Week",
+            "softLimit": "00:00"
+        }
+    ],
+    "autoStartEnabled": true,
+    "comment": "2 Month",
+    "completionNotification": {
+        "command": "",
+        "executeOn": "Ignore"
+    },
+    "description": "Traditional Backup to pool Dev2_pool, with expiration 1 Months;",
+    "enabled": true,
+    "endTime": "21:00",
+    "name": "Filesystem",
+    "nextStartDate": "2022-07-11T22:00:00-04:00",
+    "protectionGroups": [
+        "Bronze-Filesystem"
+    ],
+    "restartTimeWindow": "12:00",
+    "startInterval": "24:00",
+    "startTime": "22:00"
+}

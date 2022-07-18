@@ -1,0 +1,76 @@
+{
+    "comment": "2 Month",
+    "completionNotification": {
+        "command": "",
+        "executeOn": "Ignore"
+    },
+    "autoStartEnabled": true,
+    "description": "Traditional Backup to pool Dev2_pool, with expiration 1 Months;",
+    "restartTimeWindow": "12:00",
+    "enabled": true,
+    "actions": [
+        {
+            "comment": "",
+            "completionNotification": {
+                "command": "",
+                "executeOn": "Ignore"
+            },
+            "actionSpecificData": {
+                "backup": {
+                    "overrideRetentionPeriod": false,
+                    "clientOverride": "ClientCanOverride",
+                    "destinationStorageNodes": [
+                        "nsrserverhost"
+                    ],
+                    "retentionPeriod": "1 Months",
+                    "overrideBackupSchedule": false,
+                    "backupSpecificData": {
+                        "traditional": {
+                            "revertToFullWhenSyntheticFullFails": true,
+                            "timestampFormat": "None",
+                            "enableDDRetentionLock": false,
+                            "forceBackupLevel": "",
+                            "verifySyntheticFull": true,
+                            "destinationPool": "Dev2_pool",
+                            "estimate": false,
+                            "fileInactivityThresholdInDays": 0,
+                            "fileInactivityAlertThresholdPercentage": 0,
+                            "ddRetentionLockTime": ""
+                        }
+                    },
+                    "successThreshold": "Success"
+                }
+            },
+            "failureImpact": "Continue",
+            "scheduleOverrides": [],
+            "inactivityTimeoutInMin": 30,
+            "schedulePeriod": "Week",
+            "enabled": true,
+            "hardLimit": "00:00",
+            "retries": 1,
+            "softLimit": "00:00",
+            "concurrent": false,
+            "scheduleActivities": [
+                "incr",
+                "incr",
+                "incr",
+                "incr",
+                "incr",
+                "incr",
+                "incr"
+            ],
+            "parallelism": 100,
+            "drivenBy": "",
+            "retryDelayInSec": 30,
+            "name": "Backup"
+        }
+    ],
+    "nextStartDate": "2022-07-12T22:00:00-04:00",
+    "protectionGroups": [
+        "Bronze-Filesystem"
+    ],
+    "startInterval": "24:00",
+    "startTime": "22:00",
+    "endTime": "21:00",
+    "name": "Filesystem"
+}

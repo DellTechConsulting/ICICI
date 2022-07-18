@@ -1,0 +1,30 @@
+---
+- name: initiate on-demand backup of a client
+  include_tasks: fetch_clientId.yml
+- uri:
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/clients/{{item}}/op/backup
+    validate_certs: false
+    user: "{{username}}"
+    password: "{{password}}"
+    headers:
+      Content-Type: "application/json"
+    method: POST
+    body:
+      policy: "{{policy_name}}"
+      workflow: "{{workflow_name}}"
+    body_format: json
+    status_code: 201,400,404
+  with_items: "{{clientId}}"
+  register: response
+
+- debug: var=response
+
+- debug: 
+    msg: "Successfully initiated on-demand backup for a client {{client}}"
+  when: item.ststus == 201
+  with_items: "{{response.results}}"
+
+- fail:
+    msg: "Failed to initiate on-demand backup for a client {{client}}"
+  when: item.ststus != 201
+  with_items: "{{response.results}}"

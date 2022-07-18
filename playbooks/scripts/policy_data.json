@@ -1,0 +1,13 @@
+{
+    "description": "",
+    "comment": "Amulya",
+    "destinationPool": "Amulya",
+    "schedulePeriod": "Month",
+    "startInterval": "",
+    "startTime": "21:00",
+    "retentionPeriod": "2 Month",
+    "nextStartDate": "",
+    "restartTimeWindow": "",
+    "overrideRetentionPeriod": true,
+    "concurrent": true
+}

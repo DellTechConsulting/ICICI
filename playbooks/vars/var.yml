@@ -1,4 +1,83 @@
 ---
+location_name: location2
+policy_name: "Silver"
+workflow_name: "Filesystem"
 client: "c220216134"
 protection_groups: []
 protection_group_list: []
+updated_json: []
+clientId: []
+#Modify backup policy
+existing_policy_name: "Bronze"
+workflow_name: "Filesystem"
+remove_client: true 
+client_name: client_name
+policy_info: {
+    "description": "",
+    "comment": "",
+    "destinationPool": "",
+    "schedulePeriod": "",
+    "startInterval": "",
+    "startTime": "21:00",
+    "retentionPeriod": "1 Weeks",
+    "nextStartDate": "",
+    "restartTimeWindow": "",
+    "protectionGroups": ["Bronze-Filesystem"],
+    "overrideRetentionPeriod": true,
+    "concurrent": true,
+    "comment": "working on worflow"
+}
+
+new_backup_policy: {
+    "comment": "Template policy: Bronze",
+    "name": "Test-policy2",
+    "workflows": [
+        {
+            "actions": [
+                {
+                    "actionSpecificData": {
+                        "backup": {
+                            "backupSpecificData": {
+                                "traditional": {
+                                    
+                                }
+                            },
+                            "overrideRetentionPeriod": false,
+                            "overrideBackupSchedule": false,
+                            "retentionPeriod": "1 Weeks",
+                            "successThreshold": "Success",
+                            # "clientOverride": "ClientCanOverride"
+                        }
+                    },
+                    "comment": "working on worflow",
+                    "concurrent": true,
+                    "drivenBy": "",
+                    "enabled": true,
+                    "failureImpact": "Continue",
+                    "hardLimit": "00:00",
+                    "inactivityTimeoutInMin": 30,
+                    "name": "Backup",
+                    "parallelism": 100,
+                    "retries": 1,
+                    "retryDelayInSec": 30,
+                    "scheduleOverrides": [],
+                    "schedulePeriod": "Week",
+                    "softLimit": "00:00"
+                }
+            ],
+            "autoStartEnabled": true,
+            "comment": "working on worflow",
+            "description": "Traditional Backup to pool Dev2_pool, with expiration 1 Weeks;",
+            "enabled": true,
+            "endTime": "21:00",
+            "name": "Filesystem",
+            "nextStartDate": "2022-07-12T21:00:00-04:00",
+            "protectionGroups": [
+                "New_policy3"
+            ],
+            "restartTimeWindow": "12:00",
+            "startInterval": "24:00",
+            "startTime": "21:00"
+        }
+    ]
+}
