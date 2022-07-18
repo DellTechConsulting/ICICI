@@ -22,7 +22,8 @@
 
     - debug: var="{{protection_group}}"
 
-    - uri: 
+    - name: Fetch protection group details
+      uri: 
         url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectiongroups/{{protection_group}}
         method: GET
         user: "{{username}}"
@@ -31,9 +32,13 @@
         headers:
           Accept: "application/json"
         body_format: json            
-        status_code: 401,202,200
+        status_code: 401,200
       register: output
     - debug: var=output
+    
+    - fail:
+        msg: "Failed to fetch protection group details."
+      when: output.status != 200
 
     - set_fact: 
         workItems: "{{output.json.workItems}}"
@@ -47,7 +52,8 @@
     - debug: var=clientId
 
     #Adding client to policy 
-    - set_fact: 
+    - name: Adding clientId to workItem
+      set_fact: 
         workItems: "{{ workItems + [item] }}"
       when: item not in workItems
       with_items: "{{clientId}}"
@@ -66,10 +72,14 @@
         body:
           workItems: "{{ workItems }}"
         body_format: json   
-        status_code: 401,202,200,204         
+        status_code: 401,204,404         
       register: output
     - debug: var=output
 
     - debug:
         msg: "Successfully added client to the specified protection group"
       when: output.status == 204
+    
+    - debug:
+        msg: "Failed to added client to the specified protection group"
+      when: output.status != 204

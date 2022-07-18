@@ -1,7 +1,7 @@
 ---
 - name: Get policy details
   uri:
-    url: https://10.241.216.134:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies/{{policy_name}}
     validate_certs: false
     user: "{{username}}"
     password: "{{password}}"

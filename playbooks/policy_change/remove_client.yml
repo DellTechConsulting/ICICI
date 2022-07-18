@@ -72,6 +72,10 @@
         msg: "Successfully removed client from the specified protection group"
       when: output.status == 204
 
+    - fail:
+        msg: "Failed to remove client from the specified protection group"
+      when: output.status != 204
+
 
 
 

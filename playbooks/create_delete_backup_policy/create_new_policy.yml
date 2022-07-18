@@ -1,7 +1,7 @@
 ---
 - name: Create new backup policy and associate worflow
   uri:
-    url: https://10.241.216.134:9090/nwrestapi/v3/global/protectionpolicies
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectionpolicies
     validate_certs: false
     user: "{{username}}"
     password: "{{password}}"

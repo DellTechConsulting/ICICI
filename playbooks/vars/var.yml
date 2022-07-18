@@ -1,16 +1,17 @@
 ---
 location_name: location2
-# protection_group: "New_policy3"
-policy_name: "Test-policy2"
+policy_name: "Silver"
+workflow_name: "Filesystem"
 client: "c220216134"
 protection_groups: []
 protection_group_list: []
 updated_json: []
 clientId: []
-
 #Modify backup policy
 existing_policy_name: "Bronze"
 workflow_name: "Filesystem"
+remove_client: true 
+client_name: client_name
 policy_info: {
     "description": "",
     "comment": "",

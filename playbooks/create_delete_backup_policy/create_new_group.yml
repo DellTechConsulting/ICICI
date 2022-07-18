@@ -1,8 +1,7 @@
 ---
 - name: create new protection group
-
   uri:
-    url: https://10.241.216.134:9090/nwrestapi/v3/global/protectiongroups
+    url: https://{{endpoint}}:9090/nwrestapi/v3/global/protectiongroups
     validate_certs: false
     user: "{{username}}"
     password: "{{password}}"
@@ -12,8 +11,7 @@
     body:
       name: "{{protection_group}}"
     body_format: json
-    status_code:
-      - 201
+    status_code: 201,400,404
   register: response
 
 - debug: var=response
